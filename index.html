@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SOEverWeb</title>
+    <base href="/" />
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="SOEverWeb.styles.css" rel="stylesheet" />
+    <link href="manifest.webmanifest" rel="manifest" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+</head>
+
+<body>
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+
+    <!-- Load Monaco Editor from CDN -->
+    <script>var require = { paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs' } };</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.nls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.js"></script>
+
+    <script>
+        let editorInstance = null;
+        let dotnetHelper = null;
+
+        window.initMonaco = (elementId, dotnetObj, defaultText) => {
+            dotnetHelper = dotnetObj;
+
+            // Create Monaco Editor
+            editorInstance = monaco.editor.create(document.getElementById(elementId), {
+                value: defaultText,
+                language: 'plaintext',
+                theme: 'vs-dark',
+                lineNumbers: "on",
+                renderIndentGuides: true,
+                folding: true,
+                foldingStrategy: 'indentation',
+                scrollBeyondLastLine: true,
+                tabSize: 4,
+                insertSpaces: false, // Use real Tabs for PC Outline compatibility
+                automaticLayout: true,
+                wordWrap: 'off',
+                fontSize: 16,
+                fontFamily: 'Consolas, "Courier New", monospace'
+            });
+
+            // Listen to content changes and throttle sending back to Blazor
+            let timeoutToken;
+            editorInstance.onDidChangeModelContent((e) => {
+                clearTimeout(timeoutToken);
+                timeoutToken = setTimeout(() => {
+                    const text = editorInstance.getValue();
+                    dotnetHelper.invokeMethodAsync('OnTextChanged', text);
+                }, 100);
+            });
+        };
+
+        window.scrollToLineMonaco = (lineNumber) => {
+            if (editorInstance) {
+                editorInstance.revealLineInCenter(lineNumber);
+                editorInstance.setPosition({ lineNumber: lineNumber, column: 1 });
+                editorInstance.focus();
+            }
+        };
+
+        window.setMonacoText = (text) => {
+            if (editorInstance && editorInstance.getValue() !== text) {
+                editorInstance.setValue(text);
+            }
+        };
+
+        window.getMonacoText = () => {
+            return editorInstance ? editorInstance.getValue() : "";
+        };
+
+        window.insertIndentAtCursor = () => {
+            if (editorInstance) {
+                editorInstance.trigger('keyboard', 'tab', null);
+                editorInstance.focus();
+            }
+        };
+
+        window.outdentAtCursor = () => {
+            if (editorInstance) {
+                editorInstance.trigger('keyboard', 'outdent', null);
+                editorInstance.focus();
+            }
+        };
+
+        window.clickElement = (elementId) => {
+            document.getElementById(elementId)?.click();
+        };
+
+        window.downloadTextFile = (filename, content) => {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+    </script>
+</body>
+
+</html>

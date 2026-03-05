@@ -1,0 +1,165 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    color: #D4D4D4;
+    background-color: #1E1E1E;
+    overflow: hidden;
+}
+
+#app {
+    height: 100vh;
+}
+
+.editor-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.toolbar {
+    background-color: #2D2D30;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+.toolbar-spacer {
+    flex-grow: 1;
+}
+
+.toolbar button {
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s, opacity 0.2s;
+}
+
+.toolbar button:active {
+    opacity: 0.8;
+}
+
+.btn-primary {
+    background-color: #007ACC;
+    color: white;
+}
+
+.btn-success {
+    background-color: #28A745;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #3E3E42;
+    color: #D4D4D4;
+}
+
+.split-view {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.outline-pane {
+    width: 250px;
+    min-width: 200px;
+    background-color: #252526;
+    border-right: 1px solid #333;
+    overflow-y: auto;
+    padding: 15px 0;
+}
+
+/* Adjust layout responsively for portrait tables / phones */
+@media (max-width: 768px) {
+    .split-view {
+        flex-direction: column;
+    }
+
+    .outline-pane {
+        width: 100%;
+        height: 30%;
+        min-height: 150px;
+        border-right: none;
+        border-bottom: 2px solid #333;
+    }
+}
+
+.editor-pane {
+    flex: 1;
+    position: relative;
+    background-color: #1E1E1E;
+}
+
+#monaco-editor-container {
+    overflow: hidden;
+}
+
+.code-editor {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    background-color: transparent;
+    color: #D4D4D4;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 16px;
+    /* VERY IMPORTANT: line-height is synced with the background gradient below */
+    line-height: 24px;
+    padding: 10px;
+    border: none;
+    resize: none;
+    outline: none;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: auto;
+
+    z-index: 1;
+    position: relative;
+}
+
+/* Outline Component Styles */
+.outline-node {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 14px;
+    color: #D4D4D4;
+    line-height: 1.6;
+}
+
+.node-title {
+    padding: 4px 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-radius: 3px;
+    margin: 0 5px;
+}
+
+.node-title:hover {
+    background-color: #2A2D2E;
+}
+
+.node-title.selected {
+    background-color: #094771;
+    color: white;
+}
+
+.tree-icon {
+    display: inline-block;
+    width: 26px;
+    color: #888;
+    cursor: pointer;
+    user-select: none;
+    font-weight: bold;
+}
+
+.tree-icon:hover {
+    color: #FFF;
+}
